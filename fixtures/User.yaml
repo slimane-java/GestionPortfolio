@@ -1,0 +1,20 @@
+App\Entity\User:
+  superadmin:
+    username: superadmin
+    email: superadmin@nowell.ma
+    plainPassword: 'CrZ3%uc!'
+    enabled: true
+    roles: [ROLE_SUPER_ADMIN]
+  admin:
+    username: admin
+    email: admin@nowell.ma
+    plainPassword: 'CrZ3%uc!'
+    enabled: true
+    roles: [ROLE_ADMIN]
+  standard:
+    username: standard
+    email: standard@nowell.ma
+    plainPassword: 'CrZ3%uc!'
+    enabled: true
+    roles: [ROLE_USER]
+

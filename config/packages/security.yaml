@@ -1,0 +1,51 @@
+security:
+    encoders:
+        Symfony\Component\Security\Core\User\User: 'auto'
+        FOS\UserBundle\Model\UserInterface:
+            algorithm: auto
+        App\Entity\Client:
+            algorithm: auto
+
+    role_hierarchy:
+        ROLE_ADMIN: ROLE_USER
+        ROLE_SUPER_ADMIN: ROLE_ADMIN
+
+    # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
+    providers:
+        backend_user_provider:
+            id: fos_user.user_provider.username
+
+        client_user_provider:
+            entity:
+                class: App\Entity\Client
+                property: username
+
+        backend_chain:
+            chain:
+                providers: [ backend_user_provider, client_user_provider ]
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        main:
+            pattern: ^/admin
+            user_checker: security.user_checker
+            form_login:
+                provider: 'backend_chain'
+                login_path: /admin/login
+                check_path: /admin/login_check
+                csrf_token_generator: security.csrf.token_manager
+
+            logout:
+                path: /admin/logout
+                target: /admin/login
+            anonymous: true
+
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+        - { path: ^/admin/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/admin/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY}
+        - { path: ^/admin/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/admin, role: ROLE_USER }

@@ -1,0 +1,44 @@
+version: '2'
+networks:
+  portfolio:
+services:
+  php:
+    build: ./docker/php-fpm
+    ports:
+      - '9000'
+    volumes:
+      - ./:/var/www/symfony:cached
+      - ./docker/logs/symfony:/var/www/symfony/var/logs:cached
+    networks:
+      - portfolio
+    environment:
+      # Keep attention to that env variable
+      PHP_IDE_CONFIG: serverName=portfolio-app
+  nginx:
+    build: ./docker/nginx
+    ports:
+      - '8898:81'
+    volumes:
+      - ./:/var/www/symfony:cached
+      - ./docker/logs/nginx/:/var/log/nginx:cached
+    networks:
+      - portfolio
+
+  postgres:
+    image: postgres
+    networks:
+      - portfolio
+    ports:
+      - '5433:5432'
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_DB_NAME}
+      PGDATA: /var/lib/postgresql/data/pgdata
+
+    volumes:
+      - db-data:/var/lib/postgresql/data/pgdata
+
+volumes:
+  db-data:
+    driver: local
