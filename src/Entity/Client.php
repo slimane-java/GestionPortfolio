@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\ClientRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\User as BaseUser;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -74,10 +76,22 @@ class Client extends BaseUser
 
     protected $plainPassword;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Competence::class, mappedBy="client")
+     */
+    private $competences;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Langages::class, mappedBy="client")
+     */
+    private $langages;
+
     public function __construct()
     {
         parent::__construct();
         $this->addRole(Role::ROLE_CLIENT);
+        $this->competences = new ArrayCollection();
+        $this->langages = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -185,6 +199,66 @@ class Client extends BaseUser
     {
         $this->email = $email;
         $this->username = $email;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Competence[]
+     */
+    public function getCompetences(): Collection
+    {
+        return $this->competences;
+    }
+
+    public function addCompetence(Competence $competence): self
+    {
+        if (!$this->competences->contains($competence)) {
+            $this->competences[] = $competence;
+            $competence->setClient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCompetence(Competence $competence): self
+    {
+        if ($this->competences->removeElement($competence)) {
+            // set the owning side to null (unless already changed)
+            if ($competence->getClient() === $this) {
+                $competence->setClient(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Langages[]
+     */
+    public function getLangages(): Collection
+    {
+        return $this->langages;
+    }
+
+    public function addLangage(Langages $langage): self
+    {
+        if (!$this->langages->contains($langage)) {
+            $this->langages[] = $langage;
+            $langage->setClient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLangage(Langages $langage): self
+    {
+        if ($this->langages->removeElement($langage)) {
+            // set the owning side to null (unless already changed)
+            if ($langage->getClient() === $this) {
+                $langage->setClient(null);
+            }
+        }
 
         return $this;
     }
