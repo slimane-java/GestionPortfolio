@@ -6,11 +6,14 @@ use App\Entity\Client;
 use App\Entity\Role;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 
 class ClientCrudController extends AbstractCrudController
 {
@@ -52,10 +55,11 @@ class ClientCrudController extends AbstractCrudController
         $lastLogin = DateField::new('lastLogin');
         $confirmationToken = TextField::new('confirmationToken');
         $passwordRequestedAt = DateField::new('passwordRequestedAt');
-        $roles = TextField::new('roles');
+        $roles = ArrayField::new('roles');
         $createdAt = DateField::new('createdAt');
         $updatedAt = DateField::new('updatedAt');
-        $plainPassword = TextField::new('plainPassword');
+        $plainPassword = TextField::new('plainPassword')->setFormType(PasswordType::class)->setRequired(true);
+        $competences = AssociationField::new('competences', 'competences');
 
         if ($this->isGranted(Role::ROLE_ADMIN)) {
             $enabled->renderAsSwitch(true);
@@ -71,6 +75,6 @@ class ClientCrudController extends AbstractCrudController
             return [$name, $prenom, $dateNaissance, $tell, $adress, $linkdine, $github, $facebook, $email, $enabled, $plainPassword];
         }
 
-        return [];
     }
+
 }
